@@ -37,7 +37,7 @@ const PatternSection: React.FC<Props> = ({ currentPattern, patternBonus }) => {
                                             style={[
                                                 styles.dot,
                                                 isPatternPart && styles.dotActive,
-                                                hasBonus && isPatternPart && styles.dotBonus,
+                                                isPatternPart && styles.dotBonus,
                                             ]}
                                         />
                                     );

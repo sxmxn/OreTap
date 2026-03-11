@@ -86,6 +86,15 @@ export default function Home() {
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.actionSection}>
+          <TouchableOpacity
+            onPress={clear}
+          >
+            <Text style={styles.sellButtonText}>
+              Wipe data
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

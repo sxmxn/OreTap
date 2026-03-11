@@ -14,12 +14,12 @@ type Props = {
 };
 
 export const Grid = ({ grid, breakableGrid, toggleOre, currentUpgrade, currentAutoMinerUpgrade }: Props) => {
-  const amoundMiners = currentAutoMinerUpgrade > EAutoMinerUpgrades.NONE ? AUTO_MINER_RECORD[currentAutoMinerUpgrade].amountAutoMiners : 0;
+  const amoundMiners = AUTO_MINER_RECORD[currentAutoMinerUpgrade].amountAutoMiners;
   const minersArray = Array.from({ length: amoundMiners }, (_, i) => i);
   
   return (
     <View style={styles.grid}>
-      {minersArray.map((minerIndex) => (
+      {minersArray.length > 0 && minersArray.map((minerIndex) => (
         <AutoClicker key={`auto-miner-${minerIndex}`} onMine={toggleOre} />
       ))}
       {grid.map((row, i) => (
