@@ -1,4 +1,5 @@
 import PatternSection from "@/components/PatternSection";
+import { AppleColors, BorderRadius, Colors, Spacing, Typography } from "@/constants/theme";
 import { CLICK_RECORD } from "@/types/global";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -19,69 +20,71 @@ export default function Home() {
 
   const activeOres = Object.values(grid).flat().filter(c => c === 1).length;
 
-  const StyledButton = ({ onPress, title, disabled, variant = "primary" }: any) => {
-    const bgColor = disabled ? "#bdc3c7" : variant === "primary" ? "#3498db" : variant === "success" ? "#27ae60" : variant === "danger" ? "#e74c3c" : "#f39c12";
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled}
-        style={[styles.styledButton, { backgroundColor: bgColor, opacity: disabled ? 0.6 : 1 }]}
-      >
-        <Text style={styles.styledButtonText}>{title}</Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={styles.title}>Upclick</Text>
-          <TouchableOpacity 
-            onPress={() => router.push("/shop")}
-            style={styles.shopButton}
-          >
-            <Text style={styles.shopButtonText}>Shop</Text>
-          </TouchableOpacity>
-        </View>
+      {/* Apple-style Navigation Bar */}
+      <View style={styles.navBar}>
+        <Text style={styles.navTitle}>Upclick</Text>
+        <TouchableOpacity 
+          onPress={() => router.push("/shop")}
+          style={styles.navButton}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.navButtonText}>Shop</Text>
+        </TouchableOpacity>
       </View>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.gameArea}>
-          <Grid grid={grid} breakableGrid={breakableGrid} toggleOre={toggleOre} currentUpgrade={currentUpgrade} currentAutoMinerUpgrade={currentAutoMinerUpgrade} />
+
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Money Display - Apple Wallet Style */}
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Balance</Text>
+          <Text style={styles.balanceValue}>${Math.floor(money).toLocaleString()}</Text>
         </View>
 
+        {/* Game Grid Card */}
+        <View style={styles.card}>
+          <View style={styles.gameArea}>
+            <Grid 
+              grid={grid} 
+              breakableGrid={breakableGrid} 
+              toggleOre={toggleOre} 
+              currentUpgrade={currentUpgrade} 
+              currentAutoMinerUpgrade={currentAutoMinerUpgrade} 
+            />
+          </View>
+        </View>
+
+        {/* Stats Row */}
         <View style={styles.statsContainer}>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Money</Text>
-            <Text style={styles.statValue}>{Math.floor(money)}</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Mined Ores</Text>
+          <View style={styles.statCard}>
             <Text style={styles.statValue}>{activeOres}</Text>
+            <Text style={styles.statLabel}>Mined</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Current Ores</Text>
-            <Text style={styles.statValue} numberOfLines={1}>{CLICK_RECORD[currentUpgrade].title}</Text>
+          <View style={styles.statCard}>
+            <View style={[styles.oreIndicator, { backgroundColor: CLICK_RECORD[currentUpgrade].color }]} />
+            <Text style={styles.statLabel} numberOfLines={1}>{CLICK_RECORD[currentUpgrade].title}</Text>
           </View>
         </View>
 
+        {/* Pattern Section */}
         <PatternSection currentPattern={currentPattern} patternBonus={patternBonus} />
 
-        <View style={styles.section}>
-          {/* <Text style={styles.sectionTitle}>ACTIONS</Text>
-          <View style={styles.buttonRow}>
-            <View style={styles.buttonHalf}>
-              <StyledButton title="Clear" onPress={clear} variant="danger" />
-            </View>
-            <View style={styles.buttonHalf}>
-              <StyledButton title="Randomize" onPress={randomize} variant="primary" />
-            </View>
-          </View> */}
-          <StyledButton
-            title={`Sell (${activeOres} ores)`}
+        {/* Sell Button - Apple Style */}
+        <View style={styles.actionSection}>
+          <TouchableOpacity
             onPress={sell}
-            variant="success"
-          />
+            style={[styles.sellButton, activeOres === 0 && styles.sellButtonDisabled]}
+            activeOpacity={0.8}
+            disabled={activeOres === 0}
+          >
+            <Text style={styles.sellButtonText}>
+              Sell {activeOres} {activeOres === 1 ? 'Ore' : 'Ores'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -91,117 +94,115 @@ export default function Home() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#2c3e50",
+    backgroundColor: Colors.light.background,
   },
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f6fa",
-  },
-  contentContainer: {
-    paddingBottom: 30,
-  },
-  header: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: "#2c3e50",
-  },
-  headerTop: {
+  navBar: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 10,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.light.background,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.light.opaqueSeparator,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
+  navTitle: {
+    ...Typography.largeTitle,
+    color: Colors.light.text,
+  },
+  navButton: {
+    backgroundColor: AppleColors.blue,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.full,
+  },
+  navButtonText: {
+    ...Typography.subhead,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  container: {
     flex: 1,
+    backgroundColor: Colors.light.background,
   },
-  shopButton: {
-    backgroundColor: "#f39c12",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    flexShrink: 1,
+  contentContainer: {
+    paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.xxl,
   },
-  shopButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
+  balanceCard: {
+    backgroundColor: Colors.light.secondaryBackground,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    marginTop: Spacing.md,
+    alignItems: "center",
+  },
+  balanceLabel: {
+    ...Typography.footnote,
+    color: Colors.light.tertiaryText,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  balanceValue: {
+    ...Typography.largeTitle,
+    fontSize: 42,
+    color: Colors.light.text,
+    marginTop: Spacing.xs,
+  },
+  card: {
+    backgroundColor: Colors.light.secondaryBackground,
+    borderRadius: BorderRadius.lg,
+    marginTop: Spacing.md,
+    overflow: "hidden",
   },
   gameArea: {
     alignItems: "center",
-    backgroundColor: "#fff",
-    marginHorizontal: 10,
-    marginVertical: 15,
-    marginTop: 15,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: Spacing.lg,
   },
   statsContainer: {
     flexDirection: "row",
-    marginHorizontal: 10,
-    marginBottom: 15,
-    gap: 10,
+    marginTop: Spacing.md,
+    gap: Spacing.sm,
   },
-  statBox: {
+  statCard: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: Colors.light.secondaryBackground,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: "#7f8c8d",
-    fontWeight: "600",
+    justifyContent: "center",
+    minHeight: 72,
   },
   statValue: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginTop: 5,
+    ...Typography.title2,
+    color: Colors.light.text,
   },
-  section: {
-    marginHorizontal: 10,
-    marginVertical: 10,
+  statLabel: {
+    ...Typography.caption1,
+    color: Colors.light.tertiaryText,
+    marginTop: Spacing.xs,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 10,
-    letterSpacing: 1,
+  oreIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.xs,
   },
-  buttonRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 10,
+  actionSection: {
+    marginTop: Spacing.lg,
   },
-  buttonHalf: {
-    flex: 1,
-  },
-  styledButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    justifyContent: "center",
+  sellButton: {
+    backgroundColor: AppleColors.green,
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md,
     alignItems: "center",
-    minHeight: 44,
+    justifyContent: "center",
+    minHeight: 50,
   },
-  styledButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
+  sellButtonDisabled: {
+    backgroundColor: Colors.light.tertiaryFill,
+  },
+  sellButtonText: {
+    ...Typography.headline,
+    color: "#FFFFFF",
   },
 });

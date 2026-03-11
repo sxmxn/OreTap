@@ -1,3 +1,4 @@
+import { AppleColors, BorderRadius, Colors, Spacing, Typography } from "@/constants/theme";
 import { AUTO_MINER_RECORD, CLICK_RECORD, EAutoMinerUpgrades, EClickUpgrades, EMultiClickUpgrades, MULTI_CLICK_RECORD } from "@/types/global";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -23,129 +24,169 @@ export default function Shop() {
   const nextAutoMiner = autoMinerKeys[nextAutoMinerIndex];
   const isMaxAutoMiner = nextAutoMinerIndex >= autoMinerKeys.length;
 
-  const StyledButton = ({ onPress, title, disabled, variant = "primary" }: any) => {
-    const bgColor =
-      disabled ? "#bdc3c7" : variant === "primary" ? "#3498db" : variant === "success" ? "#27ae60" : "#f39c12";
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled}
-        style={[styles.styledButton, { backgroundColor: bgColor, opacity: disabled ? 0.6 : 1 }]}
-      >
-        <Text style={styles.styledButtonText}>{title}</Text>
-      </TouchableOpacity>
-    );
-  };
+  const canAfford = (cost: number) => money >= cost;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backButton}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>Shop</Text>
-          <View style={styles.spacer} />
-        </View>
-        <View style={styles.moneyBar}>
-          <Text style={styles.moneyText}>${Math.floor(money)}</Text>
-        </View>
-      </View>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>Ore Type Upgrades</Text>
-          <Text style={styles.categoryDescription}>Unlock new ore types to increase earnings</Text>
-
-          <View style={styles.itemCard}>
-            <View style={[styles.colorBadge, { backgroundColor: CLICK_RECORD[currentUpgrade].color }]} />
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{CLICK_RECORD[currentUpgrade].title}</Text>
-              <Text style={styles.itemStatus}>Current</Text>
-            </View>
-        </View>
-
-        {!isMaxLevel && nextUpgrade !== undefined && (
-          <View style={styles.itemCard}>
-            <View style={[styles.colorBadge, { backgroundColor: CLICK_RECORD[nextUpgrade].color }]} />
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{CLICK_RECORD[nextUpgrade].title}</Text>
-              <Text style={styles.itemPrice}>${CLICK_RECORD[nextUpgrade].moneyCost}</Text>
-            </View>
-            <StyledButton
-              title={money >= CLICK_RECORD[nextUpgrade].moneyCost ? "Buy" : "Need " + (CLICK_RECORD[nextUpgrade].moneyCost - money)}
-              disabled={money < CLICK_RECORD[nextUpgrade].moneyCost}
-              onPress={() => upgrade(nextUpgrade)}
-              variant="primary"
-            />
-          </View>
-        )}
+      {/* Apple-style Navigation Bar */}
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.navTitle}>Shop</Text>
+        <View style={styles.spacer} />
       </View>
 
-      <View style={styles.category}>
-        <Text style={styles.categoryTitle}>Multi-Click Upgrades</Text>
-        <Text style={styles.categoryDescription}>Mine multiple ores at once</Text>
+      {/* Balance Display */}
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceLabel}>Available</Text>
+        <Text style={styles.balanceValue}>${Math.floor(money).toLocaleString()}</Text>
+      </View>
 
-        <View style={styles.itemCard}>
-          <View style={styles.oreCountBadge}>
-            <Text style={styles.oreCountText}>{MULTI_CLICK_RECORD[currentMultiClickUpgrade].oreCount}</Text>
-          </View>
-          <View style={styles.itemInfo}>
-            <Text style={styles.itemName}>{MULTI_CLICK_RECORD[currentMultiClickUpgrade].title}</Text>
-            <Text style={styles.itemStatus}>Current</Text>
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Ore Type Upgrades Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>ORE TYPES</Text>
+          <View style={styles.groupedList}>
+            {/* Current Ore */}
+            <View style={styles.listItem}>
+              <View style={[styles.oreBadge, { backgroundColor: CLICK_RECORD[currentUpgrade].color }]} />
+              <View style={styles.itemContent}>
+                <Text style={styles.itemTitle}>{CLICK_RECORD[currentUpgrade].title}</Text>
+                <Text style={styles.itemSubtitle}>Current</Text>
+              </View>
+              <View style={styles.checkmark}>
+                <Text style={styles.checkmarkText}>✓</Text>
+              </View>
+            </View>
+
+            {/* Next Ore Upgrade */}
+            {!isMaxLevel && nextUpgrade !== undefined && (
+              <>
+                <View style={styles.separator} />
+                <View style={styles.listItem}>
+                  <View style={[styles.oreBadge, { backgroundColor: CLICK_RECORD[nextUpgrade].color }]} />
+                  <View style={styles.itemContent}>
+                    <Text style={styles.itemTitle}>{CLICK_RECORD[nextUpgrade].title}</Text>
+                    <Text style={[styles.itemPrice, !canAfford(CLICK_RECORD[nextUpgrade].moneyCost) && styles.itemPriceUnaffordable]}>
+                      ${CLICK_RECORD[nextUpgrade].moneyCost.toLocaleString()}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => upgrade(nextUpgrade)}
+                    disabled={!canAfford(CLICK_RECORD[nextUpgrade].moneyCost)}
+                    style={[styles.buyButton, !canAfford(CLICK_RECORD[nextUpgrade].moneyCost) && styles.buyButtonDisabled]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.buyButtonText, !canAfford(CLICK_RECORD[nextUpgrade].moneyCost) && styles.buyButtonTextDisabled]}>
+                      {canAfford(CLICK_RECORD[nextUpgrade].moneyCost) ? "Buy" : "Need More"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
-        {!isMaxMultiClick && nextMultiClick !== undefined && (
-          <View style={styles.itemCard}>
-            <View style={styles.oreCountBadge}>
-              <Text style={styles.oreCountText}>{MULTI_CLICK_RECORD[nextMultiClick].oreCount}</Text>
+        {/* Multi-Click Upgrades Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>MULTI-CLICK</Text>
+          <View style={styles.groupedList}>
+            {/* Current Multi-Click */}
+            <View style={styles.listItem}>
+              <View style={styles.countBadge}>
+                <Text style={styles.countBadgeText}>{MULTI_CLICK_RECORD[currentMultiClickUpgrade].oreCount}×</Text>
+              </View>
+              <View style={styles.itemContent}>
+                <Text style={styles.itemTitle}>{MULTI_CLICK_RECORD[currentMultiClickUpgrade].title}</Text>
+                <Text style={styles.itemSubtitle}>Current</Text>
+              </View>
+              <View style={styles.checkmark}>
+                <Text style={styles.checkmarkText}>✓</Text>
+              </View>
             </View>
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{MULTI_CLICK_RECORD[nextMultiClick].title}</Text>
-              <Text style={styles.itemPrice}>${MULTI_CLICK_RECORD[nextMultiClick].moneyCost}</Text>
-            </View>
-            <StyledButton
-              title={money >= MULTI_CLICK_RECORD[nextMultiClick].moneyCost ? "Buy" : "Need " + (MULTI_CLICK_RECORD[nextMultiClick].moneyCost - money)}
-              disabled={money < MULTI_CLICK_RECORD[nextMultiClick].moneyCost}
-              onPress={() => multiClickUpgrade(nextMultiClick)}
-              variant="primary"
-            />
-          </View>
-        )}
-      </View>
 
-      <View style={styles.category}>
-        <Text style={styles.categoryTitle}>Auto-Miner Upgrades</Text>
-        <Text style={styles.categoryDescription}>Automate ore mining</Text>
-
-        <View style={styles.itemCard}>
-          <View style={styles.oreCountBadge}>
-            <Text style={styles.oreCountText}>{AUTO_MINER_RECORD[currentAutoMinerUpgrade].amountAutoMiners}</Text>
-          </View>
-          <View style={styles.itemInfo}>
-            <Text style={styles.itemName}>{AUTO_MINER_RECORD[currentAutoMinerUpgrade].title}</Text>
-            <Text style={styles.itemStatus}>Current</Text>
+            {/* Next Multi-Click Upgrade */}
+            {!isMaxMultiClick && nextMultiClick !== undefined && (
+              <>
+                <View style={styles.separator} />
+                <View style={styles.listItem}>
+                  <View style={styles.countBadge}>
+                    <Text style={styles.countBadgeText}>{MULTI_CLICK_RECORD[nextMultiClick].oreCount}×</Text>
+                  </View>
+                  <View style={styles.itemContent}>
+                    <Text style={styles.itemTitle}>{MULTI_CLICK_RECORD[nextMultiClick].title}</Text>
+                    <Text style={[styles.itemPrice, !canAfford(MULTI_CLICK_RECORD[nextMultiClick].moneyCost) && styles.itemPriceUnaffordable]}>
+                      ${MULTI_CLICK_RECORD[nextMultiClick].moneyCost.toLocaleString()}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => multiClickUpgrade(nextMultiClick)}
+                    disabled={!canAfford(MULTI_CLICK_RECORD[nextMultiClick].moneyCost)}
+                    style={[styles.buyButton, !canAfford(MULTI_CLICK_RECORD[nextMultiClick].moneyCost) && styles.buyButtonDisabled]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.buyButtonText, !canAfford(MULTI_CLICK_RECORD[nextMultiClick].moneyCost) && styles.buyButtonTextDisabled]}>
+                      {canAfford(MULTI_CLICK_RECORD[nextMultiClick].moneyCost) ? "Buy" : "Need More"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
-        {!isMaxAutoMiner && nextAutoMiner !== undefined && (
-          <View style={styles.itemCard}>
-            <View style={styles.oreCountBadge}>
-              <Text style={styles.oreCountText}>{AUTO_MINER_RECORD[nextAutoMiner].amountAutoMiners}</Text>
+        {/* Auto-Miner Upgrades Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>AUTO-MINERS</Text>
+          <View style={styles.groupedList}>
+            {/* Current Auto-Miner */}
+            <View style={styles.listItem}>
+              <View style={[styles.countBadge, { backgroundColor: AppleColors.orange }]}>
+                <Text style={styles.countBadgeText}>{AUTO_MINER_RECORD[currentAutoMinerUpgrade].amountAutoMiners}</Text>
+              </View>
+              <View style={styles.itemContent}>
+                <Text style={styles.itemTitle}>{AUTO_MINER_RECORD[currentAutoMinerUpgrade].title}</Text>
+                <Text style={styles.itemSubtitle}>Current</Text>
+              </View>
+              <View style={styles.checkmark}>
+                <Text style={styles.checkmarkText}>✓</Text>
+              </View>
             </View>
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{AUTO_MINER_RECORD[nextAutoMiner].title}</Text>
-              <Text style={styles.itemPrice}>${AUTO_MINER_RECORD[nextAutoMiner].moneyCost}</Text>
-            </View>
-            <StyledButton
-              title={money >= AUTO_MINER_RECORD[nextAutoMiner].moneyCost ? "Buy" : "Need " + (AUTO_MINER_RECORD[nextAutoMiner].moneyCost - money)}
-              disabled={money < AUTO_MINER_RECORD[nextAutoMiner].moneyCost}
-              onPress={() => autoMinerUpgrade(nextAutoMiner)}
-              variant="primary"
-            />
+
+            {/* Next Auto-Miner Upgrade */}
+            {!isMaxAutoMiner && nextAutoMiner !== undefined && (
+              <>
+                <View style={styles.separator} />
+                <View style={styles.listItem}>
+                  <View style={[styles.countBadge, { backgroundColor: AppleColors.orange }]}>
+                    <Text style={styles.countBadgeText}>{AUTO_MINER_RECORD[nextAutoMiner].amountAutoMiners}</Text>
+                  </View>
+                  <View style={styles.itemContent}>
+                    <Text style={styles.itemTitle}>{AUTO_MINER_RECORD[nextAutoMiner].title}</Text>
+                    <Text style={[styles.itemPrice, !canAfford(AUTO_MINER_RECORD[nextAutoMiner].moneyCost) && styles.itemPriceUnaffordable]}>
+                      ${AUTO_MINER_RECORD[nextAutoMiner].moneyCost.toLocaleString()}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => autoMinerUpgrade(nextAutoMiner)}
+                    disabled={!canAfford(AUTO_MINER_RECORD[nextAutoMiner].moneyCost)}
+                    style={[styles.buyButton, !canAfford(AUTO_MINER_RECORD[nextAutoMiner].moneyCost) && styles.buyButtonDisabled]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.buyButtonText, !canAfford(AUTO_MINER_RECORD[nextAutoMiner].moneyCost) && styles.buyButtonTextDisabled]}>
+                      {canAfford(AUTO_MINER_RECORD[nextAutoMiner].moneyCost) ? "Buy" : "Need More"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
-        )}
-      </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -154,161 +195,153 @@ export default function Shop() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#2c3e50",
+    backgroundColor: Colors.light.background,
+  },
+  navBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.light.background,
+  },
+  backButton: {
+    paddingVertical: Spacing.xs,
+    paddingRight: Spacing.md,
+  },
+  backButtonText: {
+    ...Typography.body,
+    color: AppleColors.blue,
+  },
+  navTitle: {
+    ...Typography.headline,
+    color: Colors.light.text,
+  },
+  spacer: {
+    width: 60,
+  },
+  balanceContainer: {
+    alignItems: "center",
+    paddingVertical: Spacing.lg,
+    backgroundColor: Colors.light.background,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.light.opaqueSeparator,
+  },
+  balanceLabel: {
+    ...Typography.caption1,
+    color: Colors.light.tertiaryText,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  balanceValue: {
+    ...Typography.largeTitle,
+    color: Colors.light.text,
+    marginTop: Spacing.xs,
   },
   container: {
     flex: 1,
-    backgroundColor: "#f5f6fa",
+    backgroundColor: Colors.light.background,
   },
   contentContainer: {
-    paddingBottom: 30,
+    paddingBottom: Spacing.xxl,
   },
-  header: {
-    backgroundColor: "#2c3e50",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+  section: {
+    marginTop: Spacing.xl,
+    paddingHorizontal: Spacing.md,
   },
-  headerTop: {
+  sectionHeader: {
+    ...Typography.footnote,
+    color: Colors.light.tertiaryText,
+    marginBottom: Spacing.sm,
+    marginLeft: Spacing.md,
+    letterSpacing: 0.5,
+  },
+  groupedList: {
+    backgroundColor: Colors.light.secondaryBackground,
+    borderRadius: BorderRadius.md,
+    overflow: "hidden",
+  },
+  listItem: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
+    padding: Spacing.md,
+    minHeight: 60,
   },
-  backButton: {
-    fontSize: 16,
-    color: "#3498db",
-    fontWeight: "600",
+  separator: {
+    height: 0.5,
+    backgroundColor: Colors.light.opaqueSeparator,
+    marginLeft: 68,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
+  oreBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.sm,
+    marginRight: Spacing.md,
   },
-  spacer: {
-    width: 40,
-  },
-  moneyBar: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  moneyText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  category: {
-    marginHorizontal: 15,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  categoryTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    fontSize: 12,
-    color: "#7f8c8d",
-    marginBottom: 12,
-  },
-  itemCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  colorBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  oreCountBadge: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#3498db",
-    borderRadius: 8,
-    marginRight: 12,
+  countBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: AppleColors.blue,
+    marginRight: Spacing.md,
     justifyContent: "center",
     alignItems: "center",
   },
-  oreCountText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  countBadgeText: {
+    ...Typography.subhead,
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
-  itemInfo: {
+  itemContent: {
     flex: 1,
   },
-  itemName: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#2c3e50",
+  itemTitle: {
+    ...Typography.body,
+    color: Colors.light.text,
   },
-  itemStatus: {
-    fontSize: 12,
-    color: "#27ae60",
-    fontWeight: "600",
+  itemSubtitle: {
+    ...Typography.caption1,
+    color: AppleColors.green,
     marginTop: 2,
   },
   itemPrice: {
-    fontSize: 12,
-    color: "#e74c3c",
-    fontWeight: "600",
+    ...Typography.caption1,
+    color: Colors.light.tertiaryText,
     marginTop: 2,
   },
-  styledButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+  itemPriceUnaffordable: {
+    color: AppleColors.red,
+  },
+  checkmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: AppleColors.green,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: 40,
   },
-  styledButtonText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
+  checkmarkText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
   },
-  allUpgrades: {
-    marginHorizontal: 15,
-    marginTop: 30,
-  },
-  allUpgradesTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 12,
-  },
-  upgradeGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  upgradeItem: {
+  buyButton: {
+    backgroundColor: AppleColors.blue,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    minWidth: 80,
     alignItems: "center",
-    flex: 1,
-    marginHorizontal: 5,
   },
-  miniCard: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 8,
-    marginBottom: 6,
+  buyButtonDisabled: {
+    backgroundColor: Colors.light.tertiaryFill,
   },
-  miniCardText: {
-    fontSize: 11,
-    color: "#2c3e50",
+  buyButtonText: {
+    ...Typography.subhead,
     fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  buyButtonTextDisabled: {
+    color: Colors.light.tertiaryText,
   },
 });

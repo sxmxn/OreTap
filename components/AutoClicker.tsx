@@ -1,3 +1,4 @@
+import { AppleColors } from "@/constants/theme";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
@@ -88,20 +89,20 @@ const AutoClicker = ({ onMine }: AutoClickerProps) => {
       ]}
     >
       <Svg width={24} height={24} viewBox="0 0 24 24">
-        {/* Pickaxe svg */}
+        {/* Pickaxe svg - Apple-style colors */}
         <Path
           d="M3 12 L12 3 L21 12 L19.5 13.5 L14 8 L14 20 L10 20 L10 8 L4.5 13.5 Z"
-          fill="#e67e22"
-          stroke="#d35400"
+          fill={AppleColors.orange}
+          stroke="#E08600"
           strokeWidth="1"
         />
-        <Circle cx="12" cy="12" r="2" fill="#c0392b" />
-        <Circle cx="12" cy="12" r="1" fill="#ecf0f1" />
+        <Circle cx="12" cy="12" r="2" fill={AppleColors.red} />
+        <Circle cx="12" cy="12" r="1" fill="#FFFFFF" />
         {isAnimatingMining && (
           <>
-            <Circle cx="8" cy="8" r="0.5" fill="#e67e22" opacity="0.6" />
-            <Circle cx="16" cy="8" r="0.5" fill="#e67e22" opacity="0.6" />
-            <Circle cx="12" cy="16" r="0.5" fill="#e67e22" opacity="0.6" />
+            <Circle cx="8" cy="8" r="0.5" fill={AppleColors.orange} opacity="0.6" />
+            <Circle cx="16" cy="8" r="0.5" fill={AppleColors.orange} opacity="0.6" />
+            <Circle cx="12" cy="16" r="0.5" fill={AppleColors.orange} opacity="0.6" />
           </>
         )}
       </Svg>

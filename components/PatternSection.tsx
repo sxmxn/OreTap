@@ -1,3 +1,4 @@
+import { AppleColors, BorderRadius, Colors, Spacing, Typography } from "@/constants/theme";
 import { EPattern, PATTERNS } from "@/types/global";
 import React from "react";
 import {
@@ -7,110 +8,115 @@ import {
 } from "react-native";
 
 interface Props {
-     currentPattern: EPattern;
+    currentPattern: EPattern;
     patternBonus: number;
 }
 
 const PatternSection: React.FC<Props> = ({ currentPattern, patternBonus }) => {
-return(
-    <View style={styles.patternSection}>
-        <View style={[styles.patternBox, patternBonus > 1 && styles.patternBoxActive]}>
-        <Text style={styles.patternLabel}>Target Pattern</Text>
-        <Text style={styles.patternName}>{PATTERNS[currentPattern].title}</Text>  
-        {/* Pattern Preview Grid */}
-        <View style={styles.patternPreview}>
-            {Array.from({ length: 5 }).map((_, row) => (
-            <View key={row} style={styles.patternRow}>
-                {Array.from({ length: 5 }).map((_, col) => {
-                const centerRow = 2;
-                const centerCol = 2;
-                const offsetRow = row - centerRow;
-                const offsetCol = col - centerCol;
-                const isPatternPart = PATTERNS[currentPattern].offsets.some(
-                    ([dr, dc]) => dr === offsetRow && dc === offsetCol
-                );
-                return (
-                    <View
-                    key={`${row}-${col}`}
-                    style={[
-                        styles.patternDot,
-                        isPatternPart && styles.patternDotActive,
-                    ]}
-                    />
-                );
-                })}
+    const hasBonus = patternBonus > 1;
+    
+    return (
+        <View style={styles.container}>
+            <View style={[styles.card, hasBonus && styles.cardActive]}>
+                <View style={styles.content}>
+                    {/* Pattern Preview Grid - Left side */}
+                    <View style={styles.previewContainer}>
+                        {Array.from({ length: 5 }).map((_, row) => (
+                            <View key={row} style={styles.previewRow}>
+                                {Array.from({ length: 5 }).map((_, col) => {
+                                    const centerRow = 2;
+                                    const centerCol = 2;
+                                    const offsetRow = row - centerRow;
+                                    const offsetCol = col - centerCol;
+                                    const isPatternPart = PATTERNS[currentPattern].offsets.some(
+                                        ([dr, dc]) => dr === offsetRow && dc === offsetCol
+                                    );
+                                    return (
+                                        <View
+                                            key={`${row}-${col}`}
+                                            style={[
+                                                styles.dot,
+                                                isPatternPart && styles.dotActive,
+                                                hasBonus && isPatternPart && styles.dotBonus,
+                                            ]}
+                                        />
+                                    );
+                                })}
+                            </View>
+                        ))}
+                    </View>
+                    
+                    {/* Info - Right side */}
+                    <View style={styles.info}>
+                        <Text style={styles.label}>TARGET</Text>
+                        <Text style={styles.title}>{PATTERNS[currentPattern].title}</Text>
+                        {hasBonus && (
+                            <Text style={styles.bonusMessage}>+{((patternBonus - 1) * 100).toFixed(0)}% bonus active</Text>
+                        )}
+                    </View>
+                </View>
             </View>
-            ))}
         </View>
-        
-        {patternBonus > 1 && (
-            <Text style={styles.bonusText}>+{(patternBonus * 100 - 100).toFixed(0)}% Next Sell!</Text>
-        )}
-        </View>
-    </View>
-  );
+    );
 }
 
 export default PatternSection;
 
 const styles = StyleSheet.create({
-  patternSection: {
-    marginHorizontal: 10,
-    marginVertical: 10,
-  },
-  patternBox: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-    borderWidth: 2,
-    borderColor: "#e0e0e0",
-  },
-  patternBoxActive: {
-    borderColor: "#FFD700",
-    backgroundColor: "#fffacd",
-  },
-  patternLabel: {
-    fontSize: 10,
-    color: "#7f8c8d",
-    fontWeight: "600",
-    marginBottom: 5,
-  },
-  patternName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#2c3e50",
-  },
-  bonusText: {
-    fontSize: 12,
-    color: "#FFD700",
-    fontWeight: "bold",
-    marginTop: 8,
-  },
-  patternPreview: {
-    marginTop: 12,
-    gap: 4,
-  },
-  patternRow: {
-    flexDirection: "row",
-    gap: 4,
-    justifyContent: "center",
-  },
-  patternDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  patternDotActive: {
-    backgroundColor: "#FFD700",
-    borderColor: "#FFA500",
-  },
+    container: {
+        marginTop: Spacing.sm,
+    },
+    card: {
+        backgroundColor: Colors.light.secondaryBackground,
+        borderRadius: BorderRadius.md,
+        padding: Spacing.md,
+    },
+    cardActive: {
+        backgroundColor: '#FFFBEB',
+        borderWidth: 1,
+        borderColor: AppleColors.yellow,
+    },
+    content: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    previewContainer: {
+        gap: 2,
+        marginRight: Spacing.md,
+    },
+    previewRow: {
+        flexDirection: "row",
+        gap: 2,
+    },
+    dot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: Colors.light.tertiaryFill,
+    },
+    dotActive: {
+        backgroundColor: Colors.light.fill,
+    },
+    dotBonus: {
+        backgroundColor: AppleColors.yellow,
+    },
+    info: {
+        flex: 1,
+    },
+    label: {
+        ...Typography.caption2,
+        color: Colors.light.tertiaryText,
+        letterSpacing: 0.5,
+    },
+    title: {
+        ...Typography.headline,
+        color: Colors.light.text,
+        marginTop: 2,
+    },
+    bonusMessage: {
+        ...Typography.caption1,
+        color: AppleColors.orange,
+        marginTop: 4,
+        fontWeight: "500",
+    },
 });

@@ -1,3 +1,4 @@
+import { Spacing } from "@/constants/theme";
 import { AUTO_MINER_RECORD, EAutoMinerUpgrades, EClickUpgrades } from "@/types/global";
 import React from "react";
 import { StyleSheet, View } from "react-native";
@@ -22,14 +23,7 @@ export const Grid = ({ grid, breakableGrid, toggleOre, currentUpgrade, currentAu
         <AutoClicker key={`auto-miner-${minerIndex}`} onMine={toggleOre} />
       ))}
       {grid.map((row, i) => (
-        <View
-          key={`row-${i}`}
-          style={[
-            styles.row,
-            // i % 2 === 1 && styles.offsetRow,
-          ]}
-        >
-          
+        <View key={`row-${i}`} style={styles.row}>
           {row.map((ore, j) => (
             <Ore
               key={`${i}-${j}`}
@@ -48,12 +42,10 @@ export const Grid = ({ grid, breakableGrid, toggleOre, currentUpgrade, currentAu
 const styles = StyleSheet.create({
   grid: {
     alignItems: "center",
+    padding: Spacing.xs,
   },
   row: {
     flexDirection: "row",
-    height: 24,
-  },
-  offsetRow: {
-    marginLeft: 12,
+    height: 25,
   },
 });
