@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "game-of-life",
-    "slug": "game-of-life",
+    "name": "upclick",
+    "slug": "upclick",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gameoflife",
+    "scheme": "upclick",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
